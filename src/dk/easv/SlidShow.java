@@ -11,7 +11,9 @@ public class SlidShow implements Runnable{
 
     private int timeMS;
 
-    private Image image = null;
+    private static int imageNumber;
+
+    private static Image image = null;
     public SlidShow(List<Image> image, int imageIndex, int time)
     {
         images = images;
@@ -22,23 +24,24 @@ public class SlidShow implements Runnable{
     public void run() {
         if(currentImageIndex > images.size())
         {
-            currentImageIndex = 0;
-           image = images.get((currentImageIndex) % images.size());
+            //currentImageIndex = 0;
+           //image = images.get((currentImageIndex) % images.size());
+            imageNumber = 0;
         }
         else if(currentImageIndex < images.size())
         {
-           image = images.get((currentImageIndex + 1) % images.size());
+           //image = images.get((currentImageIndex + 1) % images.size());
+            imageNumber = currentImageIndex + 1;
         }
         try {
             Thread.sleep(timeMS);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        getImage();
     }
 
-    private Image getImage()
+    public static int getImage()
     {
-        return image;
+        return imageNumber;
     }
 }
