@@ -30,7 +30,7 @@ public class SlidShow implements Runnable{
            image = images.get((currentImageIndex + 1) % images.size());
         }
         try {
-            Thread.sleep(10000);
+            Thread.sleep(timeMS);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
