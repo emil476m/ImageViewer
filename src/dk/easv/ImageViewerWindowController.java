@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,6 +20,8 @@ import javafx.stage.Stage;
 public class ImageViewerWindowController
 {
     private final List<Image> images = new ArrayList<>();
+    @FXML
+    private Label lblFileNameExtreme;
     @FXML
     private TextField txtTime;
     @FXML
@@ -95,9 +97,14 @@ public class ImageViewerWindowController
 
     public void handleBtnSlideShow(ActionEvent actionEvent) throws Exception {
         int time = Integer.parseInt(txtTime.getText());
+        SlideShow slideShow = new SlideShow(images, time, currentImageIndex, imageView);
         setToggleSlide();
-        Runnable threat = new SlidShow(images, time, currentImageIndex, imageView);
-        SlidShow.setSlideShow(toggleSlide);
+        Runnable threat = slideShow;
+
+        slideShow.messageProperty().addListener((obs, o, n) -> {
+            lblFileNameExtreme.setText(n);
+        });
+        SlideShow.setSlideShow(toggleSlide);
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
         executorService.schedule(threat,time,TimeUnit.SECONDS);
     }

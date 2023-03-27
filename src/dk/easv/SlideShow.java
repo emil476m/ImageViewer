@@ -1,14 +1,17 @@
 package dk.easv;
 
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import java.io.File;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-public class SlidShow implements Runnable {
+public class SlideShow extends Task<Image> {
 
     private List<Image> images;
     private int currentImageIndex;
@@ -22,7 +25,7 @@ public class SlidShow implements Runnable {
     static boolean slideShow;
 
     private static Image image = null;
-    public SlidShow(List<Image> image, int time, int currentImageIndex ,ImageView imageView)
+    public SlideShow(List<Image> image, int time, int currentImageIndex , ImageView imageView)
     {
         this.images = image;
         this.currentImageIndex = currentImageIndex;
@@ -43,6 +46,8 @@ public class SlidShow implements Runnable {
            while (slideShow) {
                Platform.runLater(() -> {
                    imageView.setImage(images.get(currentImageIndex));
+                   File file = new File(images.get(currentImageIndex).getUrl());
+                   this.updateMessage(file.getName());
 
                });
                currentImageIndex = (currentImageIndex+1) % images.size();
@@ -53,5 +58,12 @@ public class SlidShow implements Runnable {
                }
            }
         }
+    }
+
+    @Override
+    protected Image call() throws Exception {
+        run();
+        Image image = images.get(currentImageIndex);
+        return image;
     }
 }
