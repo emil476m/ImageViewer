@@ -1,47 +1,57 @@
 package dk.easv;
 
+import javafx.application.Platform;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-public class SlidShow implements Runnable{
+public class SlidShow implements Runnable {
 
     private List<Image> images;
     private int currentImageIndex;
 
     private int timeMS;
 
-    private static int imageNumber;
+    ImageView imageView;
+
+    Button btn;
+
+    static boolean slideShow;
 
     private static Image image = null;
-    public SlidShow(List<Image> image, int imageIndex, int time)
+    public SlidShow(List<Image> image, int time, int currentImageIndex ,ImageView imageView)
     {
-        images = images;
-        currentImageIndex = imageIndex;
-        timeMS = time*1000;
-    }
-    @Override
-    public void run() {
-        if(currentImageIndex > images.size())
-        {
-            //currentImageIndex = 0;
-           //image = images.get((currentImageIndex) % images.size());
-            imageNumber = 0;
-        }
-        else if(currentImageIndex < images.size())
-        {
-           //image = images.get((currentImageIndex + 1) % images.size());
-            imageNumber = currentImageIndex + 1;
-        }
-        try {
-            Thread.sleep(timeMS);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        this.images = image;
+        this.currentImageIndex = currentImageIndex;
+        this.imageView = imageView;
+        this.timeMS = time;
+
     }
 
-    public static int getImage()
+    public static void setSlideShow(boolean slide)
     {
-        return imageNumber;
+        slideShow = slide;
+    }
+
+    @Override
+    public void run() {
+        if(!images.isEmpty())
+        {
+           while (slideShow) {
+               Platform.runLater(() -> {
+                   imageView.setImage(images.get(currentImageIndex));
+
+               });
+               currentImageIndex = (currentImageIndex+1) % images.size();
+               try {
+                   TimeUnit.SECONDS.sleep(timeMS);
+               } catch (InterruptedException e) {
+                   throw new RuntimeException(e);
+               }
+           }
+        }
     }
 }

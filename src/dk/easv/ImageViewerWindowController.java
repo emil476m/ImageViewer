@@ -3,11 +3,9 @@ package dk.easv;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -34,7 +32,7 @@ public class ImageViewerWindowController
     @FXML
     private ImageView imageView;
 
-    private boolean toggleSlide = false;
+    private static boolean toggleSlide = false;
 
     @FXML
     private void handleBtnLoadAction()
@@ -95,20 +93,12 @@ public class ImageViewerWindowController
         }
     }
 
-    public void handleBtnSlideShow(ActionEvent actionEvent) {
+    public void handleBtnSlideShow(ActionEvent actionEvent) throws Exception {
+        int time = Integer.parseInt(txtTime.getText());
         setToggleSlide();
+        Runnable threat = new SlidShow(images, time, currentImageIndex, imageView);
+        SlidShow.setSlideShow(toggleSlide);
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
-        if (toggleSlide){
-            System.out.println("test");
-            int time = Integer.parseInt(txtTime.getText());
-            Runnable threat = new SlidShow(images, currentImageIndex, time);
-
-            executorService.schedule(threat, 1, TimeUnit.SECONDS);
-
-            currentImageIndex = SlidShow.getImage();
-            displayImage();
-        } else if (!toggleSlide) {
-            executorService.shutdownNow();
-        }
+        executorService.schedule(threat,time,TimeUnit.SECONDS);
     }
 }
